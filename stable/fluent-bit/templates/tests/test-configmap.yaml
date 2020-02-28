@@ -1,3 +1,6 @@
+{{ $forward_tls := .Values.backend.forward.tls | quote }}
+{{ $es_tls := .Values.backend.es.tls | quote }}
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -10,7 +13,7 @@ metadata:
 data:
   run.sh: |-
     {{- if eq .Values.backend.type "forward"}}
-    {{- if eq .Values.backend.forward.tls "on"}}
+    {{- if eq $forward_tls "on"}}
     fluent-gem install fluent-plugin-secure-forward
     {{- end }}
     @test "Test fluentd" {
@@ -31,7 +34,7 @@ data:
 
   fluentd.conf: |-
     <source>
-      {{- if eq .Values.backend.forward.tls "off" }}
+      {{- if eq $forward_tls "off" }}
       @type forward
       bind 0.0.0.0
       port {{ .Values.backend.forward.port }}

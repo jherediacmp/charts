@@ -1,4 +1,6 @@
-{{- if or (eq .Values.backend.type "forward") (and (eq .Values.backend.type "es") (eq .Values.backend.es.tls "off")) }}
+{{ $forward_tls := .Values.backend.forward.tls | quote }}
+{{ $es_tls := .Values.backend.es.tls | quote }}
+{{- if or (eq .Values.backend.type "forward") (and (eq .Values.backend.type "es") (eq $es_tls "off")) }}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -32,7 +34,7 @@ spec:
       image: "dwdraju/alpine-curl-jq"
       {{- end }}
       command: ["/tools/bats/bats", "-t", "/tests/run.sh"]
-      {{- if and (eq .Values.backend.forward.tls "on") (eq .Values.backend.type "forward") }}
+      {{- if and (eq $forward_tls "on") (eq .Values.backend.type "forward") }}
       securityContext:
         # run as root to install fluent gems
         runAsUser: 0
